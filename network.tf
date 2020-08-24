@@ -11,20 +11,15 @@ resource "aws_vpc" "ecs_vpc" {
 
 # Create Subnets
 
-resource "aws_subnet" "subnet_a" {
+resource "aws_subnet" "subnet" {
+  count = length(var.availability_zones)
   vpc_id     = aws_vpc.ecs_vpc.id
-  cidr_block = var.subneta_cidr
-  availability_zone = var.subneta_az
+  cidr_block = cidrsubnet(var.cidr_vpc, 8, count.index)
+  availability_zone = element(var.availability_zones, count.index)
   map_public_ip_on_launch = true
 }
 
-resource "aws_subnet" "subnet_b" {
-  vpc_id     = aws_vpc.ecs_vpc.id
-  cidr_block = var.subnetb_cidr
-  availability_zone = var.subnetb_az
-  map_public_ip_on_launch = true
-}
-
+ 
 # Create Internet Gateway
 
 resource "aws_internet_gateway" "gw" {
@@ -46,12 +41,10 @@ resource "aws_route_table" "rt_public" {
 
 # Associate rt with subnet 
 
-resource "aws_route_table_association" "rta_a" {
-  subnet_id      = aws_subnet.subnet_a.id
-  route_table_id = aws_route_table.rt_public.id
-}
 
-resource "aws_route_table_association" "rta_b" {
-  subnet_id      = aws_subnet.subnet_b.id
+resource "aws_route_table_association" "public" {
+  count = length(var.availability_zones)
+
+  subnet_id = element(aws_subnet.subnet.*.id, count.index)
   route_table_id = aws_route_table.rt_public.id
 }
