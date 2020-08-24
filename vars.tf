@@ -11,7 +11,7 @@ variable "cluster_name" {
 
 variable "alb_name" {
   description = "ELB name"
-  default = "test_alb"
+  default = "testalb"
 }
 
 variable availability_zones {

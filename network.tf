@@ -46,5 +46,42 @@ resource "aws_route_table_association" "public" {
   count = length(var.availability_zones)
 
   subnet_id = element(aws_subnet.subnet.*.id, count.index)
-  route_table_id = aws_route_table.rt_public.id
+  route_table_id  = aws_route_table.rt_public.id
+  
+}
+
+
+
+
+
+
+# SG 
+
+resource "aws_security_group" "alb" {
+  name   = "sg-alb"
+  vpc_id = aws_vpc.ecs_vpc.id
+ 
+  ingress {
+   protocol         = "tcp"
+   from_port        = 80
+   to_port          = 80
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+ 
+  ingress {
+   protocol         = "tcp"
+   from_port        = 443
+   to_port          = 443
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+ 
+  egress {
+   protocol         = "-1"
+   from_port        = 0
+   to_port          = 0
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
 }
