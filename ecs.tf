@@ -3,17 +3,8 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 
-resource "aws_ecs_task_definition" "test_task" {
-  family                = "service"
+resource "aws_ecs_task_definition" "ecs_task" {
+  family                = "ecs_task"
   container_definitions = file("task-definitions/webserver.json")
-
-  volume {
-    name      = "service-storage"
-    host_path = "/ecs/service-storage"
-  }
-
-  placement_constraints {
-    type       = "memberOf"
-    expression = "attribute:ecs.availability-zone in [us-west-2a, us-west-2b]"
-  }
+  network_mode = "bridge"
 }
