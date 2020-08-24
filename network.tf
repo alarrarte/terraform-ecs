@@ -58,7 +58,7 @@ resource "aws_route_table_association" "public" {
 # SG 
 
 resource "aws_security_group" "alb" {
-  name   = "sg-alb"
+  name   = "alb-sg"
   vpc_id = aws_vpc.ecs_vpc.id
  
   ingress {
@@ -73,6 +73,35 @@ resource "aws_security_group" "alb" {
    protocol         = "tcp"
    from_port        = 443
    to_port          = 443
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+ 
+  egress {
+   protocol         = "-1"
+   from_port        = 0
+   to_port          = 0
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_security_group" "ec2-allow" {
+  name   = "ec2-allow"
+  vpc_id = aws_vpc.ecs_vpc.id
+ 
+  ingress {
+   protocol         = "tcp"
+   from_port        = 22
+   to_port          = 22
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+ 
+  ingress {
+   protocol         = "tcp"
+   from_port        = 80
+   to_port          = 80
    cidr_blocks      = ["0.0.0.0/0"]
    ipv6_cidr_blocks = ["::/0"]
   }
