@@ -13,7 +13,7 @@ variable "alb_name" {
   description = "ELB name"
   default = "testalb"
 }
-
+# test commit on branch
 # Launch configuration
 variable "lc_ami" {
   default = "ami-fad25980"
