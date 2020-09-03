@@ -19,7 +19,7 @@ variable "lc_ami" {
   default = "ami-fad25980"
 }
 variable "lc_flavor" {
-  default = "t2.micro"
+  default = "t2.medium"
 }
 
 variable "ecs_key_pair_name" {
@@ -28,7 +28,7 @@ variable "ecs_key_pair_name" {
 
 # ASG
 variable "max_instance_size" {
-  default = "3"
+  default = "1"
 }
 
 variable "min_instance_size" {
@@ -36,12 +36,12 @@ variable "min_instance_size" {
 }
 
 variable "desired_capacity" {
-  default = "2"
+  default = "1"
 }
 
 # ECS
 variable "cluster_name" {
   description = "ECS Cluster name"
-  default = "ecs_cluster"
+  default = "netbox_cluster"
 }
 

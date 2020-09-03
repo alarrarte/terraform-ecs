@@ -1,0 +1,19 @@
+[
+  {
+    "entryPoint": [
+      "sh",
+      "-c",
+      "redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}"
+    ],
+    "cpu": 0,
+    "environment": [
+      {
+        "name": "REDIS_PASSWORD",
+        "value": "H733Kdjndks81"
+      }
+    ],
+    "memoryReservation": 128,
+    "image": "redis:5-alpine",
+    "name": "redis"
+  }
+]

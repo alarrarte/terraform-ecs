@@ -1,51 +1,6 @@
-# ALB
-resource "aws_lb" "test_alb" {
-  name               = var.alb_name
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = aws_subnet.subnet.*.id
-  security_groups = [aws_security_group.alb.id]
-  enable_deletion_protection = false
-}
-
-
-resource "aws_alb_target_group" "test-target-group" {
-    name                = "test-target-group"
-    port                = "80"
-    protocol            = "HTTP"
-    vpc_id              = aws_vpc.ecs_vpc.id
-
-    health_check {
-        healthy_threshold   = "5"
-        unhealthy_threshold = "2"
-        interval            = "30"
-        matcher             = "200"
-        path                = "/"
-        port                = "traffic-port"
-        protocol            = "HTTP"
-        timeout             = "5"
-    }
-
-    depends_on = [
-        aws_lb.test_alb
-    ]
-}
-
-resource "aws_alb_listener" "test_alb_listener" {
-    load_balancer_arn = aws_lb.test_alb.arn
-    port              = "80"
-    protocol          = "HTTP"
-
-    default_action {
-        target_group_arn = aws_alb_target_group.test-target-group.arn
-        type             = "forward"
-    }
-}
-
-
 # Launch configuration
-resource "aws_launch_configuration" "ecs-launch-configuration" {
-    name                        = "ecs-launch-configuration"
+resource "aws_launch_configuration" "netbox-launch-configuration" {
+    name                        = "netbox-launch-configuration"
     image_id                    = var.lc_ami
     instance_type               = var.lc_flavor
     iam_instance_profile        = aws_iam_instance_profile.ecs-instance-profile.id
@@ -69,14 +24,12 @@ resource "aws_launch_configuration" "ecs-launch-configuration" {
                                   EOF
 }
 
-
-
 # ASG
-resource "aws_autoscaling_group" "ecs-autoscaling-group" {
-    name                        = "ecs-autoscaling-group"
+resource "aws_autoscaling_group" "netbox-autoscaling-group" {
+    name                        = "netbox-autoscaling-group"
     max_size                    = var.max_instance_size
     min_size                    = var.min_instance_size
     desired_capacity            = var.desired_capacity
-    vpc_zone_identifier         = aws_subnet.subnet.*.id
-    launch_configuration        = aws_launch_configuration.ecs-launch-configuration.name
+    vpc_zone_identifier         = [ aws_subnet.netbox_subnet_a.id ]
+    launch_configuration        = aws_launch_configuration.netbox-launch-configuration.name
 }

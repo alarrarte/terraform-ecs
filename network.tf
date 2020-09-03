@@ -1,116 +1,31 @@
 # Create VPC
 
+# imported via terraform
 resource "aws_vpc" "ecs_vpc" {
-  cidr_block       = var.cidr_vpc
-  instance_tenancy = "default"
+  # added to prevent recreation (import)
+  cidr_block = "192.168.0.0/16"
 
+  # added to prevent recreation (import)
   tags = {
-    Name = "ecs_vpc"
+    Name = "interactive-vpc"
   }
 }
 
-# Create Subnets
-
-resource "aws_subnet" "subnet" {
-  count = length(var.availability_zones)
-  vpc_id     = aws_vpc.ecs_vpc.id
-  cidr_block = cidrsubnet(var.cidr_vpc, 8, count.index)
-  availability_zone = element(var.availability_zones, count.index)
-  map_public_ip_on_launch = true
-}
-
- 
-# Create Internet Gateway
-
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.ecs_vpc.id
-
-}
-
-
-# Create Route Table
-
-resource "aws_route_table" "rt_public" {
-  vpc_id = aws_vpc.ecs_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
-  }
-}
-
-
-# Associate rt with subnet 
-
-
-resource "aws_route_table_association" "public" {
-  count = length(var.availability_zones)
-
-  subnet_id = element(aws_subnet.subnet.*.id, count.index)
-  route_table_id  = aws_route_table.rt_public.id
-  
-}
-
-
-
-
-
-
-# SG 
-
-resource "aws_security_group" "alb" {
-  name   = "alb-sg"
-  vpc_id = aws_vpc.ecs_vpc.id
- 
-  ingress {
-   protocol         = "tcp"
-   from_port        = 80
-   to_port          = 80
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
-  }
- 
-  ingress {
-   protocol         = "tcp"
-   from_port        = 443
-   to_port          = 443
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
-  }
- 
-  egress {
-   protocol         = "-1"
-   from_port        = 0
-   to_port          = 0
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
-  }
-}
-
+# imported via terraform  'terraform import aws_security_group.ec2-allow sg-02d42b700dfb9250a'
 resource "aws_security_group" "ec2-allow" {
-  name   = "ec2-allow"
+  # added to prevent recreation (import)
+  description = "interactive ec2"
+}
+
+# imported via terraform  'terraform import aws_subnet.netbox_subnet_a subnet-0d638b14aab6f9db3'
+resource "aws_subnet" "netbox_subnet_a" {
+
+  # added to prevent recreation (import)
   vpc_id = aws_vpc.ecs_vpc.id
- 
-  ingress {
-   protocol         = "tcp"
-   from_port        = 22
-   to_port          = 22
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
-  }
- 
-  ingress {
-   protocol         = "tcp"
-   from_port        = 80
-   to_port          = 80
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
-  }
- 
-  egress {
-   protocol         = "-1"
-   from_port        = 0
-   to_port          = 0
-   cidr_blocks      = ["0.0.0.0/0"]
-   ipv6_cidr_blocks = ["::/0"]
+  cidr_block = "192.168.0.0/24"
+
+  # added to prevent recreation (import)
+  tags = {
+    Name = "interactive_subneta"
   }
 }
